@@ -114,43 +114,28 @@ class DurakGame:
         trump_card = self.deck.set_trump()
         
         players = self.set_players()
-
+        for p in players:
+            print('{}\'s hand: {}'.format(p.name, p.hand))
+        print('The {} is the trump card!'.format(trump_card))
+        print('So {} is the trump suit.'.format(trump_card.suit))
+        print(' ')
         print('Begin attack!')
         
-        while len(self.deck.new_deck) > -1:
-            for turn in range(1,100):
-                if turn % 2 == 0:
-                    attacker = players[0]
-                    defender = players[1]
-                else:
-                    attacker = players[1]
-                    defender = players[0]
+        #while len(self.deck.new_deck) > -1:
+         #   for turn in range(1,100):
+          #      if turn % 2 == 0:
+           #         attacker = players[0]
+            #        defender = players[1]
+             #   else:
+              #      attacker = players[1]
+               #     defender = players[0]
             
-                self.single_deal(attacker, 3)
+                #self.single_deal(attacker, 3)
             
             # if len(self.deck.new_deck) == 0:
             #     print('end of deck')
             #     break
-        
-        
 
-                
-        
 start = DurakGame()
 start.play()
 
-        
-''' 
-newDeck = Deck()
-hand = []
-for i in range(0,6):
-    hand.append(newDeck.pick_card())
-    
-trump = newDeck.set_trump()
-
-print(trump)
-print(hand)
-print(hand[0], hand[4])
-wins = newDeck.compare(hand[0], hand[4], trump)
-print('The winner is {}!'.format(wins))
-'''
