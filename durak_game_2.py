@@ -75,9 +75,6 @@ class Player:
         self.card = None
         
 class DurakGame:
-    
-    # def __init__(self):
-        
         
     def set_players(self):
         self.players = []
@@ -99,7 +96,7 @@ class DurakGame:
         winner.wins += 1
         print(w)
         
-    def single_deal(self, player, num):
+    def single_deal(self, player, num = 1):
         for c in range(0,num):
             player.hand.append(self.deck.pick_card())
             
@@ -114,6 +111,17 @@ class DurakGame:
 
         print('Begin attack!')
         
+        print(self.deck.new_deck)
+        print(len(self.deck.new_deck))
+        print(players[0].hand)
+        print(players[1].hand)
+
+        self.single_deal(players[0],26)
+        print(self.deck.new_deck)
+        print(len(self.deck.new_deck))
+        print(players[0].hand)
+        print(players[1].hand)
+        '''
         while len(self.deck.new_deck) > -1:
             for turn in range(1,100):
                 if turn % 2 == 0:
@@ -124,7 +132,10 @@ class DurakGame:
                     defender = players[0]
             
                 self.single_deal(attacker, 3)
-            
+                print(attacker.hand)
+            if len(self.deck.new_deck) == 0:
+                break
+            '''
             # if len(self.deck.new_deck) == 0:
             #     print('end of deck')
             #     break
