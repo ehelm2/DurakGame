@@ -110,18 +110,7 @@ class DurakGame:
         players = self.set_players()
 
         print('Begin attack!')
-        
-        print(self.deck.new_deck)
-        print(len(self.deck.new_deck))
-        print(players[0].hand)
-        print(players[1].hand)
 
-        self.single_deal(players[0],26)
-        print(self.deck.new_deck)
-        print(len(self.deck.new_deck))
-        print(players[0].hand)
-        print(players[1].hand)
-        '''
         while len(self.deck.new_deck) > -1:
             for turn in range(1,100):
                 if turn % 2 == 0:
@@ -133,14 +122,11 @@ class DurakGame:
             
                 self.single_deal(attacker, 3)
                 print(attacker.hand)
+
             if len(self.deck.new_deck) == 0:
-                break
-            '''
-            # if len(self.deck.new_deck) == 0:
-            #     print('end of deck')
-            #     break
-               
-        
+                 print('end of deck')
+                 break
+ 
 start = DurakGame()
 start.play()
 
