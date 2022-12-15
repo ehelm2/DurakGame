@@ -167,21 +167,25 @@ class DurakGame:
                     print('Cards in {}\'s hand: {}'.format(attacker.name, attacker.hand))
             
                     attack_card = str(input('Which card would you like to play? '))
-                    self.play_a_card(attacker, attack_card)
-
+                    attack_card = self.play_a_card(attacker, attack_card)
+                    # How do I keep this as a card class?
                     battle_cards.append(attack_card)
 
                     print('The defender is {}. {}, look away!\n'.format(defender.name, attacker.name))
                     print('Cards in {}\'s hand: {}\n'.format(defender.name, defender.hand))
-                    print('The defender may accept the attack, ending the round,')
+                    print('The defender may accept the attack, ending their turn,')
                     print('or they may defend with a better card.\n')
                     
                     move = input('What would you like to do? Take or Play? ')
                     
                     valid_cards = []
                     for c in defender.hand:
+                        print(type(c))
+                        print(type(battle_cards[-1]))
+                        '''
                         if c > battle_cards[-1]:
                             valid_cards.append(c)
+                        '''
                     
                     if len(valid_cards) == 0:
                         print('No valid card to play. Must take the attack.')
@@ -221,6 +225,7 @@ class DurakGame:
             if players[1].wins == 5:
                 print('{} wins the game!'.format(players[1].name))
                 game_on = False
+
 start = DurakGame()
 start.play()
 
