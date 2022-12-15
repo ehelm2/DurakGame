@@ -4,6 +4,8 @@ Created on Sun Dec  4 09:32:21 2022
 
 @author: emily
 """
+
+## OBSELETE##
 from random import shuffle
 
 class Card:
