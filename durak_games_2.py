@@ -4,11 +4,11 @@ Created on Fri Dec 16 13:53:32 2022
 
 @author: emily
 """
-
 from random import shuffle
 from time import sleep
 
 class Card:
+    
     def __init__(self, rank, suit, value):
         self.rank = rank
         self.suit = suit
@@ -29,15 +29,16 @@ class Card:
         return card
         
 class Deck:
+    
     def __init__(self):
         self.new_deck = []
-        rank = ['Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace']
-        suit = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
-        value = [6, 7, 8, 9, 10, 11, 12, 13, 14]
+        self.rank = ['Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace']
+        self.suit = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+        self.value = [6, 7, 8, 9, 10, 11, 12, 13, 14]
         
-        for i in range(len(rank)):
-            for j in range(len(suit)):
-                self.new_deck.append(Card(rank[i], suit[j], value[i]))
+        for i in range(len(self.rank)):
+            for j in range(len(self.suit)):
+                self.new_deck.append(Card(self.rank[i], self.suit[j], self.value[i]))
                 
         shuffle(self.new_deck)
     
@@ -74,14 +75,61 @@ class Player:
         self.wins = 0
         self.hand = []
         self.card = None
+
+class Interface:
+    pass
+    
+class cmdLine(Interface):
+    
+    def getnames(self):
+        self.p1 = input('Enter Player 1\'s Name: ')
+        self.p2 = input('Enter Player 2\'s Name: ')
         
+        return self.p1, self.p2
+    
+    def getcard(self, deck_obj):
+        selected_card = str(input('Which card would you like to play? '))
+        
+        check_string = selected_card.split(' ')
+        
+        while not len(check_string) == 3:
+            print('Please type as seen on screen. Try again!')
+            selected_card = str(input('Which card would you like to play? '))
+            check_string = selected_card.split(' ')            
+
+        while not check_string[0] in deck_obj.rank and not check_string[2] in deck_obj.suit:
+            print('Please check spelling and capitalization. Try again!')
+            selected_card = str(input('Which card would you like to play? '))
+            check_string = selected_card.split(' ')
+
+        return selected_card
+    
+    def getmove(self):
+        
+        selected_move = input('What would you like to do? Take or Play? ')
+        
+        available_moves = ['take', 'play']
+        
+        while not selected_move.lower() in available_moves:
+            selected_move = input('What would you like to do? Take or Play? ')
+        
+        return selected_move
+        
+class pyGame(Interface):
+    
+    def __init__(self):
+        pass
+    def getnames(self):
+        pass
+    def getcard(self):
+        pass
+    def getmove(self):
+        pass
+    
 class DurakGame:
     
     def __init__(self, interface):
-        p1, p2 = interface.getnames
-    
-    def runGame():
-        interface.getCard(plrNum)
+        self.p1, self.p2 = interface.getnames()
 
     def setup(self):
         self.deck = Deck()
@@ -112,7 +160,13 @@ class DurakGame:
             print('{} has {} and is the first attacker!'.format(self.players[1].name, dealt_trumps[0]))
             self.players.reverse()
         elif len(dealt_trumps) == 0:
-            print('Oops, no one has a trump card! Shuffle and try again.')
+            print('Oops, no one has a trump card! Player with lowest card value goes first.')
+            p1_lowest = self.players[0].hand.sort(key = lambda x: x.value)
+            p2_lowest = self.players[1].hand.sort(key = lambda x: x.value)
+            
+            if p1_lowest[0] > p2_lowest[0]:
+                print('{} has {} and is the first attacker!'.format(self.players[1].name, p2_lowest[0]))
+                self.players.reverse()
 
         return self.players, trump_card
         
@@ -133,7 +187,7 @@ class DurakGame:
                 player.hand.remove(c)
                 return c
 
-    def play(self, beginner = False):        
+    def play(self, interface, beginner = False):        
         
         game_on = True
 
@@ -166,8 +220,9 @@ class DurakGame:
 
                     # print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
                     print('Cards in {}\'s hand: {}'.format(attacker.name, attacker.hand))
-            
-                    attack_card = str(input('Which card would you like to play? '))
+                    
+                    attack_card = interface.getcard(self.deck)
+                    # attack_card = str(input('Which card would you like to play? '))
                     battle_cards.append(self.play_a_card(attacker, attack_card))
                     
                     print('battlecards {}'.format(battle_cards))
@@ -177,7 +232,8 @@ class DurakGame:
                     print('The defender may accept the attack, ending their turn,')
                     print('or they may defend with a better card.\n')
                     
-                    move = input('What would you like to do? Take or Play? ')
+                    move = interface.getmove
+                    # move = input('What would you like to do? Take or Play? ')
                     
                     if move.lower() == 'take':
                         defender.hand.append(battle_cards.pop())
@@ -225,32 +281,21 @@ class DurakGame:
                 game_on = False
                 
 
-class Interface:
-    pass
+
+
+
     
 
-class cmdLine(Interface):
-    def __init__(self):
-        self.p1 = input('Enter Player 1\'s Name: ')
-        self.p2 = input('Enter Player 2\'s Name: ')
-        self.gamelogic = DurakGame(self.p1, self.p2)
-        
-    def run(self):
-        players, trump_card = self.gamelogic.setup()
- 
-class pyGame(Interface):
-    def __init__(self):
-        self.p1 = input('Enter Player 1\'s Name: ')
-        self.p2 = input('Enter Player 2\'s Name: ')
-        self.gamelogic = DurakGame(self.p1, self.p2)
 
 
+# start = DurakGame()
+# start.play()
 
-start = DurakGame()
-start.play()
 
-if __main__ = __name__:
-    intoObj = CmdLine()
+if __name__ == "__main__":
+    intObj = cmdLine()
     gamelogic = DurakGame(intObj)
     
-    gamelogic.runGame()
+    gamelogic.play(intObj)
+    
+    
