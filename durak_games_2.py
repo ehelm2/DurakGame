@@ -208,7 +208,6 @@ class DurakGame:
                     #attacker must pass or can attack again
 
                         #compare to see which card wins
-                    
 
 
                     if len(players[0].hand) == 0:
@@ -224,6 +223,7 @@ class DurakGame:
             if players[1].wins == 5:
                 print('{} wins the game!'.format(players[1].name))
                 game_on = False
+                
 
 class Interface:
     pass
