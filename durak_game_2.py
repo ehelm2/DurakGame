@@ -16,15 +16,11 @@ class Card:
     def __lt__(self, card2):
         if self.value < card2.value:
             return True
-        elif self.value == card2.value:
-            print('Play again')
         return False
     
     def __gt__(self, card2):
         if self.value > card2.value:
             return True
-        elif self.value == card2.value:
-            print('Play again')
         return False
         
     def __repr__(self):
@@ -129,11 +125,10 @@ class DurakGame:
             player.hand.append(self.deck.pick_card())
 
     def play_a_card(self, player, card):
-        ## I need to refine this so that I can make sure I can account for misspellings
         for c in player.hand:
             if str(c) == card:
-                active_card = player.hand.remove(c)
-                return active_card
+                player.hand.remove(c)
+                return c
 
     def play(self, beginner = False):        
         
@@ -156,6 +151,9 @@ class DurakGame:
                 
                 # turn level
                 for turn in range(1, 100):
+                    print('~~~~~~~~~')
+                    print('TURN %i' % turn)
+                    print('~~~~~~~~~')
                     
                     attacker = players[0]
                     defender = players[1]
@@ -163,13 +161,13 @@ class DurakGame:
                     # To store all cards up for grabs
                     battle_cards = []
 
-                    print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
+                    # print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
                     print('Cards in {}\'s hand: {}'.format(attacker.name, attacker.hand))
             
                     attack_card = str(input('Which card would you like to play? '))
-                    attack_card = self.play_a_card(attacker, attack_card)
-                    # How do I keep this as a card class?
-                    battle_cards.append(attack_card)
+                    battle_cards.append(self.play_a_card(attacker, attack_card))
+                    
+                    print('battlecards {}'.format(battle_cards))
 
                     print('The defender is {}. {}, look away!\n'.format(defender.name, attacker.name))
                     print('Cards in {}\'s hand: {}\n'.format(defender.name, defender.hand))
@@ -178,39 +176,37 @@ class DurakGame:
                     
                     move = input('What would you like to do? Take or Play? ')
                     
-                    valid_cards = []
-                    for c in defender.hand:
-                        print(type(c))
-                        print(type(battle_cards[-1]))
-                        '''
-                        if c > battle_cards[-1]:
-                            valid_cards.append(c)
-                        '''
-                    
-                    if len(valid_cards) == 0:
-                        print('No valid card to play. Must take the attack.')
-                        defender.hand.append(battle_cards.pop())
-                        continue
-
-                    elif move.lower() == 'take':
+                    if move.lower() == 'take':
                         defender.hand.append(battle_cards.pop())
                         print('Attack succeeded! The card has been added to {}\'s hand'.format(defender.name))
                         continue
+                    
+                    if move.lower() == 'play':
+                        
+                        valid_cards = []
+                        for c in defender.hand:
+                            if c > battle_cards[-1]:
+                                valid_cards.append(c)
+                        
+                        if len(valid_cards) == 0:
+                            print('No valid card to play. Must take the attack.')
+                            defender.hand.append(battle_cards.pop())
+                            continue
 
-                    elif move.lower() == 'play':
                         print('You can play any of these cards from your hand: {}'.format(valid_cards))
 
                         defender_card = str(input('Which card will you play? '))
-                        #need to insert here an error/retry if not from valid_cards
-
-                        self.play_a_card(defender, defender_card)
-                        battle_cards.append(defender_card)
+                        battle_cards.append(self.play_a_card(defender, defender_card))
 
                         print('{} has defended with {}'.format(defender.name, defender_card))
                     
-                        #attacker must pass or can attack again
+                        
+                    
+                    #attacker must pass or can attack again
 
                         #compare to see which card wins
+                    
+
 
                     if len(players[0].hand) == 0:
                         self.wins(players[0])
@@ -228,4 +224,3 @@ class DurakGame:
 
 start = DurakGame()
 start.play()
-
