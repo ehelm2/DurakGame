@@ -106,17 +106,17 @@ class cmdLine(Interface):
     
     def getmove(self):
         
-        selected_move = input('What would you like to do? Take or Play? ')
+        selected_move = input('What would you like to do? Pass or Play? ')
         
-        available_moves = ['take', 'play']
+        available_moves = ['pass', 'play']
         
         while not selected_move.lower() in available_moves:
-            print('Oops try typing \'take\' or \'play\'')
-            selected_move = input('What would you like to do? Take or Play? ')
+            print('Oops try typing \'pass\' or \'play\'')
+            selected_move = input('What would you like to do? Pass or Play? ')
         
         return selected_move.lower()
     
-    def getvalid(self, list_of_cards, hand, position):
+    def getvalid(self, trump_suit, list_of_cards, hand, position):
         
         valid_cards = []
         
@@ -128,7 +128,10 @@ class cmdLine(Interface):
         
         if position == 'defender':
             for c in hand:
-                if c > list_of_cards[-1]:
+                if c.suit == trump_suit:
+                    if c > list_of_cards[-1]:
+                        valid_cards.append(c)
+                if c.suit == list_of_cards[-1].suit and c > list_of_cards[-1]:
                     valid_cards.append(c)
         
         return valid_cards
@@ -171,14 +174,8 @@ class DurakGame:
         print('The player with the lowest trump card goes first...')
 
         dealt_trumps.sort(key=lambda x: x.value)
-
-        if dealt_trumps[0] in self.players[0].hand:
-            print('{} has {} and is the first attacker!'.format(self.players[0].name, dealt_trumps[0]))
         
-        elif dealt_trumps[0] in self.players[1].hand:
-            print('{} has {} and is the first attacker!'.format(self.players[1].name, dealt_trumps[0]))
-            self.players.reverse()
-        elif len(dealt_trumps) == 0:
+        if len(dealt_trumps) == 0:
             print('Oops, no one has a trump card! Player with lowest card value goes first.')
             p1_lowest = self.players[0].hand.sort(key = lambda x: x.value)
             p2_lowest = self.players[1].hand.sort(key = lambda x: x.value)
@@ -186,6 +183,12 @@ class DurakGame:
             if p1_lowest[0] > p2_lowest[0]:
                 print('{} has {} and is the first attacker!'.format(self.players[1].name, p2_lowest[0]))
                 self.players.reverse()
+        elif dealt_trumps[0] in self.players[0].hand:
+            print('{} has {} and is the first attacker!'.format(self.players[0].name, dealt_trumps[0]))
+        
+        elif dealt_trumps[0] in self.players[1].hand:
+            print('{} has {} and is the first attacker!'.format(self.players[1].name, dealt_trumps[0]))
+            self.players.reverse()
 
         return self.players, trump_card
         
@@ -195,6 +198,8 @@ class DurakGame:
         print(w)
         
     def deal(self, player, num = 1):
+        if num <= 0:
+            return
         for c in range(0, num):
             if len(self.deck.new_deck) == 0:
                 break
@@ -216,17 +221,20 @@ class DurakGame:
 
             # Round level
             while len(players[0].hand) > 0 and len(players[1].hand) > 0:
-                out_of_cards = False
-
-                if not out_of_cards:
-                    for p in players:
-                        self.deal(p, (6-len(p.hand)))
-                if len(self.deck.new_deck) <= 0:
-                    out_of_cards = True
-                    print('Out of cards in the deck!')
                 
                 # turn level
                 for turn in range(1, 100):
+                    
+                    out_of_cards = False
+                                
+                    if not out_of_cards:
+                        for p in players:
+                            self.deal(p, (6-len(p.hand)))
+                            print('DEALING')
+                            if len(self.deck.new_deck) <= 0:
+                                out_of_cards = True
+                                print('Out of cards in the deck!')
+                                     
                     end_turn = False
                     
                     print('~~~~~~~~~')
@@ -239,82 +247,98 @@ class DurakGame:
                     # To store all cards up for grabs
                     battle_cards = []
 
-                    # print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
+                    print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
                     print('Cards in {}\'s hand: {}'.format(attacker.name, attacker.hand))
                     
                     attack_card = interface.getcard(self.deck)
-                    # attack_card = str(input('Which card would you like to play? '))
                     battle_cards.append(self.play_a_card(attacker, attack_card))
-                    
-                    # print('battlecards {}'.format(battle_cards))
 
                     print('The defender is {}. {}, look away!\n'.format(defender.name, attacker.name))
                     print('Cards in {}\'s hand: {}\n'.format(defender.name, defender.hand))
                     print('The defender may accept the attack, ending their turn,')
                     print('or they may defend with a better card.\n')
-                    
-                    move = interface.getmove()
-                    
-                    if move == 'take':
-                        defender.hand.append(battle_cards.pop())
-                        print('Very well then. The card has been added to {}\'s hand.'.format(defender.name))
-                        continue
-                    
+
                     while not end_turn:
-                        if move == 'play':
-                            
-                            valid_cards = interface.getvalid(battle_cards, defender.hand, 'defender')
-    
-                            if len(valid_cards) == 0:
-                                print('No valid card to play. Must take the attack.')
-                                defender.hand.append(battle_cards.pop())
-                                end_turn = True
-                                continue
-    
-                            print('You can play any of these cards from your hand: {}'.format(valid_cards))
-    
-                            defender_card = interface.getcard(self.deck)
-                            battle_cards.append(self.play_a_card(defender, defender_card))
-    
-                            print('{} has defended with {}'.format(defender.name, defender_card))
+                        # getting move from defender
+                        valid_cards = interface.getvalid(
+                                trump_card.suit, battle_cards, defender.hand, 'defender')
+                        print('You can play any of these cards from your hand: {}'.format(valid_cards))
                         
-                        print('{} may choose to take the cards or attack again.'.format(attacker.name))
-                            
-                        move = interface.getmove()
+                        d_move = interface.getmove()
                         
-                        if move == 'take':
+                    
+                        if d_move == 'pass':
                             for c in battle_cards:
-                                attacker.hand.append(c)
-                            print('Very well then. The card has been added to {}\'s hand.'.format(attacker.name))
+                                    defender.hand.append(c)
+                            print('Very well then. The card has been added to {}\'s hand.'.format(defender.name))
+                            # Attacker gets to attack again if defender takes card on the first round
+                            if not len(battle_cards) == 1:
+                                players.reverse()
                             end_turn = True
                             continue
                         
-                        if move == 'play':
-                            valid_cards = interface.getvalid(battle_cards, attacker.hand, 'attacker')
+                        if d_move == 'play':
                             
                             if len(valid_cards) == 0:
                                 print('No valid card to play. Must take the attack.')
                                 for c in battle_cards:
-                                    attacker.hand.append(c)
+                                    defender.hand.append(c)
                                 end_turn = True
                                 continue
-                            
-                            print('You can play any of these cards from your hand: {}'.format(valid_cards))
+
+                            defender_card = interface.getcard(self.deck)
+                            battle_cards.append(self.play_a_card(defender, defender_card))
     
+                            print('{} has defended with {}'.format(defender.name, defender_card))                            
+                        
+                        print('{} may choose to pass or attack again.'.format(attacker.name))
+                        
+                        # Getting move from attacker
+                        
+                        valid_cards = interface.getvalid(
+                                trump_card.suit, battle_cards, attacker.hand, 'attacker')
+                        print('You can play any of these cards from your hand: {}'.format(valid_cards))
+                        a_move = interface.getmove()
+                        
+                        if a_move == 'pass':
+                            # Cards on table are discarded, not added to attacker's hand
+                            for c in battle_cards:
+                                battle_cards.pop()
+                            print('Very well then. The cards have been discarded.')
+                            players.reverse()
+                            end_turn = True
+                            continue
+                        
+                        if a_move == 'play':
+                            
+                            if len(valid_cards) == 0:
+                                print('No valid card to play. Must pass.')
+                                for c in battle_cards:
+                                    battle_cards.pop()
+                                end_turn = True
+                                players.reverse()
+                                continue
+
                             attacker_card = interface.getcard(self.deck)
                             battle_cards.append(self.play_a_card(attacker, attacker_card))
     
                             print('{} has attacked with {}'.format(attacker.name, attacker_card))
 
-
-                        #compare to see which card wins
-
-
                     if len(players[0].hand) == 0:
                         self.wins(players[0])
+                        print('{} wins this round!'.format(players[0].name))
+                        print('{} has {} wins.'.format(
+                            players[0].name, players[0].wins))
+                        print('{} has {} wins. First to 5 is the big winner!'.format(
+                            players[1].name, players[1].wins))
                         break
-                    if len(players[1].hand) == 0:
+                    elif len(players[1].hand) == 0:
                         self.wins(players[1])
+                        print('{} wins this round!'.format(players[1].name))
+                        print('{} has {} wins.'.format(
+                            players[1].name, players[1].wins))
+                        print('{} has {} wins. First to 5 is the big winner!'.format(
+                            players[0].name, players[0].wins))
                         break
             
             if players[0].wins == 5:
