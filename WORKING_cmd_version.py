@@ -135,8 +135,7 @@ class cmdLine(Interface):
                     valid_cards.append(c)
         
         return valid_cards
-        
-        
+               
 class pyGame(Interface):
     
     def __init__(self):
@@ -146,6 +145,8 @@ class pyGame(Interface):
     def getcard(self):
         pass
     def getmove(self):
+        pass
+    def getvalid(self):
         pass
     
 class DurakGame:
@@ -211,10 +212,13 @@ class DurakGame:
                 player.hand.remove(c)
                 return c
 
-    def play(self, interface, beginner = False):        
+    def play(self, interface, key = None):   #beginner = False
         
         game_on = True
-
+        
+        if key == None:
+            return
+        
         while game_on:
 
             players, trump_card = self.setup()
@@ -230,11 +234,13 @@ class DurakGame:
                     if not out_of_cards:
                         for p in players:
                             self.deal(p, (6-len(p.hand)))
-                            print('DEALING')
                             if len(self.deck.new_deck) <= 0:
                                 out_of_cards = True
                                 print('Out of cards in the deck!')
-                                     
+
+                    for p in players:
+                        p.hand.sort(key=lambda x: x.value)
+
                     end_turn = False
                     
                     print('~~~~~~~~~')
@@ -247,12 +253,14 @@ class DurakGame:
                     # To store all cards up for grabs
                     battle_cards = []
 
+                    current_player = attacker
                     print('The attacker is {}. {}, look away!'.format(attacker.name, defender.name))
                     print('Cards in {}\'s hand: {}'.format(attacker.name, attacker.hand))
                     
                     attack_card = interface.getcard(self.deck)
                     battle_cards.append(self.play_a_card(attacker, attack_card))
 
+                    current_player = defender
                     print('The defender is {}. {}, look away!\n'.format(defender.name, attacker.name))
                     print('Cards in {}\'s hand: {}\n'.format(defender.name, defender.hand))
                     print('The defender may accept the attack, ending their turn,')
@@ -260,12 +268,12 @@ class DurakGame:
 
                     while not end_turn:
                         # getting move from defender
+                        current_player = defender
                         valid_cards = interface.getvalid(
                                 trump_card.suit, battle_cards, defender.hand, 'defender')
                         print('You can play any of these cards from your hand: {}'.format(valid_cards))
                         
                         d_move = interface.getmove()
-                        
                     
                         if d_move == 'pass':
                             for c in battle_cards:
@@ -293,8 +301,8 @@ class DurakGame:
                         
                         print('{} may choose to pass or attack again.'.format(attacker.name))
                         
+                        current_player = attacker
                         # Getting move from attacker
-                        
                         valid_cards = interface.getvalid(
                                 trump_card.suit, battle_cards, attacker.hand, 'attacker')
                         print('You can play any of these cards from your hand: {}'.format(valid_cards))
@@ -350,9 +358,8 @@ class DurakGame:
 
 
 if __name__ == "__main__":
-    intObj = cmdLine()
+    intObj = pyGame()
     gamelogic = DurakGame(intObj)
     
     gamelogic.play(intObj)
-    
-    
+       
