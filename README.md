@@ -33,10 +33,14 @@ or
   I allow the GUI interface to run, but only a window pops up. To see this window, make the following changes in the main block at the bottom of the script:
   
   `if __name__: '__main__':`
+  
       `gamelogic = DurakGame()`
+      
       `intObj = PyGame()`
+      
 
       `# gamelogic.run_game(intObj)`
+      
       `gamelogic.play(intObj, class_demo = True)`
       
     Otherwise, keep intObj = PyGame(), run gamelogic.run_game(intObj), and comment out gamelogic.play(intObj, class_demo = True).
