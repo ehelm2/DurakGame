@@ -919,7 +919,7 @@ class DurakGame:
 
 if __name__ == "__main__":
     gamelogic = DurakGame()
-    intObj = cmdLine()
+    intObj = CmdLine()
     
     # Run if intObj = PyGame()
     # gamelogic.run_game(intObj)
