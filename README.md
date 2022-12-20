@@ -39,11 +39,11 @@ or
       `intObj = PyGame()`
       
 
-      `# gamelogic.run_game(intObj)`
+      `gamelogic.run_game(intObj)`
       
-      `gamelogic.play(intObj, class_demo = True)`
+      `#gamelogic.play(intObj, class_demo = True)`
       
-    Otherwise, keep intObj = PyGame(), run gamelogic.run_game(intObj), and comment out gamelogic.play(intObj, class_demo = True).
+    Otherwise, keep intObj = CmdLine(), run gamelogic.play(intObj, class_demo = True) , and comment out gamelogic.run_game(intObj) .
     
  - class_demo = True is to help in presenting the game for the final presentation. The game can be ended early when prompted.
 
